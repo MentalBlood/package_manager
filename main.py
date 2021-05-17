@@ -1,3 +1,5 @@
+import time
+
 class Manager:
 	def __init__(self):
 		self.packages = {}
@@ -41,11 +43,10 @@ class Manager:
 
 	def rebuildPackage(self, name):
 		package = self.packages[name]
-		new_version_number = package['version'] + 1
+		new_version_number = time.time()
 		dependencies = self.getAllDependencies(name)
 		for d in dependencies:
-			if self.getVersion(d) < new_version_number:
-				self.rebuildPackage_(d, new_version_number)
+			self.rebuildPackage_(d, new_version_number)
 		dependencies_data = {
 			d: self.packages[d]['data']
 			for d in package['dependencies']
