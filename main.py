@@ -5,6 +5,7 @@ class Manager:
 	def addPackage(self, name, build_function, dependencies):
 		new_package = {
 			'name': name,
+			'version': 0,
 			'build_function': build_function,
 			'dependencies': dependencies,
 			'data': None
@@ -26,21 +27,28 @@ class Manager:
 	def getData(self, name):
 		return self.packages[name]['data']
 
-	def rebuildPackage_(self, name):
+	def getVersion(self, name):
+		return self.packages[name]['version']
+
+	def rebuildPackage_(self, name, new_version_number):
 		package = self.packages[name]
 		dependencies_data = {
 			d: self.packages[d]['data']
 			for d in package['dependencies']
 		}
 		package['data'] = package['build_function'](dependencies_data)
+		package['version'] = new_version_number
 
 	def rebuildPackage(self, name):
 		package = self.packages[name]
+		new_version_number = package['version'] + 1
 		dependencies = self.getAllDependencies(name)
 		for d in dependencies:
-			self.rebuildPackage_(d)
+			if self.getVersion(d) < new_version_number:
+				self.rebuildPackage_(d, new_version_number)
 		dependencies_data = {
 			d: self.packages[d]['data']
 			for d in package['dependencies']
 		}
 		package['data'] = package['build_function'](dependencies_data)
+		package['version'] = new_version_number
